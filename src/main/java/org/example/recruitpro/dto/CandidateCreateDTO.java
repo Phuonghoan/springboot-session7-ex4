@@ -8,31 +8,29 @@ import jakarta.validation.constraints.Size;
 
 public class CandidateCreateDTO {
 
-    @NotBlank(message = "Họ tên không được để trống")
+    @NotBlank(message = "Full Name cannot be empty")
     @Size(
             min = 5,
             max = 50,
-            message = "Họ tên phải có từ 5 đến 50 ký tự"
+            message = "Full Name must contain 5 to 50 characters"
     )
     private String fullName;
 
-    @NotBlank(message = "Email không được để trống")
-    @Email(message = "Email không đúng định dạng")
+    @NotBlank(message = "Email cannot be empty")
+    @Email(message = "Email is invalid")
     private String email;
 
-    @NotNull(message = "Tuổi không được để trống")
+    @NotNull(message = "Age cannot be empty")
     @Min(
             value = 18,
-            message = "Ứng viên phải từ 18 tuổi trở lên"
+            message = "Age must be at least 18"
     )
     private Integer age;
 
-    @NotNull(
-            message = "Số năm kinh nghiệm không được để trống"
-    )
+    @NotNull(message = "Years of experience cannot be empty")
     @Min(
             value = 0,
-            message = "Số năm kinh nghiệm không được là số âm"
+            message = "Years of experience cannot be negative"
     )
     private Integer yearsOfExperience;
 

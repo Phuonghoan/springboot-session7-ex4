@@ -1,5 +1,6 @@
 package org.example.recruitpro.exception;
 
+import org.example.recruitpro.response.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,31 +14,34 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>>
+    public ResponseEntity<ApiResponse<Map<String, String>>>
     handleValidationException(
             MethodArgumentNotValidException exception
     ) {
-        Map<String, String> fieldErrors =
-                new LinkedHashMap<>();
+        Map<String, String> errors = new LinkedHashMap<>();
 
         exception.getBindingResult()
                 .getFieldErrors()
-                .forEach(error ->
-                        fieldErrors.put(
-                                error.getField(),
-                                error.getDefaultMessage()
+                .forEach(fieldError ->
+                        errors.putIfAbsent(
+                                fieldError.getField(),
+                                fieldError.getDefaultMessage()
                         )
                 );
 
-        Map<String, Object> response =
-                new LinkedHashMap<>();
-
-        response.put("success", false);
-        response.put("message", "Dữ liệu không hợp lệ");
-        response.put("errors", fieldErrors);
+        ApiResponse<Map<String, String>> response =
+                ApiResponse.of(
+                        statusText(HttpStatus.BAD_REQUEST),
+                        "Dữ liệu không hợp lệ",
+                        errors
+                );
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(response);
+    }
+
+    private String statusText(HttpStatus status) {
+        return status.value() + " " + status.name();
     }
 }
