@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class CandidateCreateDTO {
@@ -34,6 +35,13 @@ public class CandidateCreateDTO {
     )
     private Integer yearsOfExperience;
 
+    @NotBlank(message = "Số điện thoại không được để trống")
+    @Pattern(
+            regexp = "^0[35789][0-9]{8}$",
+            message = "Số điện thoại không hợp lệ"
+    )
+    private String phoneNumber;
+
     public CandidateCreateDTO() {
     }
 
@@ -41,12 +49,14 @@ public class CandidateCreateDTO {
             String fullName,
             String email,
             Integer age,
-            Integer yearsOfExperience
+            Integer yearsOfExperience,
+            String phoneNumber
     ) {
         this.fullName = fullName;
         this.email = email;
         this.age = age;
         this.yearsOfExperience = yearsOfExperience;
+        this.phoneNumber = phoneNumber;
     }
 
     public String getFullName() {
@@ -81,5 +91,13 @@ public class CandidateCreateDTO {
             Integer yearsOfExperience
     ) {
         this.yearsOfExperience = yearsOfExperience;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }
