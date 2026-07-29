@@ -1,11 +1,13 @@
 package org.example.recruitpro.controller;
 
 import org.example.recruitpro.dto.CandidateCreateDTO;
+import org.example.recruitpro.dto.CandidateUpdateDTO;
 import org.example.recruitpro.entity.Candidate;
 import org.example.recruitpro.response.ApiResponse;
 import org.example.recruitpro.service.CandidateService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,19 +32,41 @@ public class CandidateController {
         Candidate createdCandidate =
                 candidateService.createCandidate(request);
 
-        ApiResponse<Candidate> response =
-                ApiResponse.of(
-                        statusText(HttpStatus.CREATED),
-                        "Candidate created successfully",
-                        createdCandidate
-                );
-
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(response);
+                .body(
+                        ApiResponse.of(
+                                "201 CREATED",
+                                "Candidate created successfully",
+                                createdCandidate
+                        )
+                );
     }
 
-    private String statusText(HttpStatus status) {
-        return status.value() + " " + status.name();
+    @PutMapping(
+            value = "/update/{id}",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<ApiResponse<Candidate>>
+    updateCandidate(
+            @PathVariable Long id,
+
+            @Valid
+            @ModelAttribute
+            CandidateUpdateDTO request
+    ) {
+        Candidate updatedCandidate =
+                candidateService.updateCandidate(
+                        id,
+                        request
+                );
+
+        return ResponseEntity.ok(
+                ApiResponse.of(
+                        "200 OK",
+                        "Candidate updated successfully",
+                        updatedCandidate
+                )
+        );
     }
 }

@@ -2,6 +2,8 @@ package org.example.recruitpro.entity;
 
 import jakarta.persistence.*;
 
+import jakarta.persistence.*;
+
 @Entity
 @Table(name = "candidates")
 public class Candidate {
@@ -35,6 +37,15 @@ public class Candidate {
     )
     private Integer yearsOfExperience;
 
+    @Column(name = "address")
+    private String address;
+
+    @Column(
+            name = "bio",
+            length = 200
+    )
+    private String bio;
+
     public Candidate() {
     }
 
@@ -43,25 +54,17 @@ public class Candidate {
             String fullName,
             String email,
             Integer age,
-            Integer yearsOfExperience
+            Integer yearsOfExperience,
+            String address,
+            String bio
     ) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
         this.age = age;
         this.yearsOfExperience = yearsOfExperience;
-    }
-
-    public Candidate(
-            String fullName,
-            String email,
-            Integer age,
-            Integer yearsOfExperience
-    ) {
-        this.fullName = fullName;
-        this.email = email;
-        this.age = age;
-        this.yearsOfExperience = yearsOfExperience;
+        this.address = address;
+        this.bio = bio;
     }
 
     public Long getId() {
@@ -104,5 +107,21 @@ public class Candidate {
             Integer yearsOfExperience
     ) {
         this.yearsOfExperience = yearsOfExperience;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
     }
 }

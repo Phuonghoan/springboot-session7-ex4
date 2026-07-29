@@ -3,6 +3,8 @@ package org.example.recruitpro.exception;
 import org.example.recruitpro.response.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -13,15 +15,61 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    /*
+     * Validation lỗi khi dùng @RequestBody.
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Map<String, String>>>
-    handleValidationException(
+    handleRequestBodyValidation(
             MethodArgumentNotValidException exception
     ) {
-        Map<String, String> errors = new LinkedHashMap<>();
+        return buildValidationResponse(
+                exception.getBindingResult()
+        );
+    }
 
-        exception.getBindingResult()
-                .getFieldErrors()
+    /*
+     * Validation hoặc binding lỗi khi dùng @ModelAttribute.
+     */
+    @ExceptionHandler(BindException.class)
+    public ResponseEntity<ApiResponse<Map<String, String>>>
+    handleFormValidation(
+            BindException exception
+    ) {
+        return buildValidationResponse(
+                exception.getBindingResult()
+        );
+    }
+
+    /*
+     * Không tìm thấy Candidate.
+     */
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>>
+    handleResourceNotFound(
+            ResourceNotFoundException exception
+    ) {
+        ApiResponse<Void> response =
+                ApiResponse.of(
+                        "404 NOT_FOUND",
+                        exception.getMessage(),
+                        null
+                );
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(response);
+    }
+
+    private ResponseEntity<
+            ApiResponse<Map<String, String>>
+            > buildValidationResponse(
+            BindingResult bindingResult
+    ) {
+        Map<String, String> errors =
+                new LinkedHashMap<>();
+
+        bindingResult.getFieldErrors()
                 .forEach(fieldError ->
                         errors.putIfAbsent(
                                 fieldError.getField(),
@@ -31,17 +79,13 @@ public class GlobalExceptionHandler {
 
         ApiResponse<Map<String, String>> response =
                 ApiResponse.of(
-                        statusText(HttpStatus.BAD_REQUEST),
+                        "400 BAD_REQUEST",
                         "Dữ liệu không hợp lệ",
                         errors
                 );
 
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .badRequest()
                 .body(response);
-    }
-
-    private String statusText(HttpStatus status) {
-        return status.value() + " " + status.name();
     }
 }
